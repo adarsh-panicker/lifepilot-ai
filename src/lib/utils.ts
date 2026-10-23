@@ -38,8 +38,13 @@ export function isOverdue(dueDateString: string, completed: boolean): boolean {
   if (completed) return false;
   try {
     const due = new Date(dueDateString);
+    if (isNaN(due.getTime())) return false;
     const now = new Date();
-    // Compare date portions or timestamps
+    // If the due date string was just YYYY-MM-DD or T00:00:00, treat deadline as end of that day
+    if (dueDateString.length === 10 || dueDateString.includes('T00:00:00')) {
+      const dueEndOfDay = new Date(due.getFullYear(), due.getMonth(), due.getDate(), 23, 59, 59, 999);
+      return dueEndOfDay.getTime() < now.getTime();
+    }
     return due.getTime() < now.getTime();
   } catch {
     return false;

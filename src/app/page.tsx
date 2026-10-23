@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Task, DailyPlan, CreateTaskInput } from '@/lib/types';
+import { isOverdue } from '@/lib/utils';
 import TaskCard from '@/components/TaskCard';
 import TaskModal from '@/components/TaskModal';
 import VoiceAssistantPanel from '@/components/VoiceAssistantPanel';
@@ -74,6 +75,7 @@ export default function DashboardPage() {
       });
       if (res.ok) {
         fetchTasks();
+        fetchPlan();
       }
     } catch (e) {
       console.error(e);
@@ -86,6 +88,7 @@ export default function DashboardPage() {
       const res = await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
       if (res.ok) {
         fetchTasks();
+        fetchPlan();
       }
     } catch (e) {
       console.error(e);
@@ -108,15 +111,14 @@ export default function DashboardPage() {
     }
     setEditingTask(null);
     fetchTasks();
+    fetchPlan();
   };
 
   // Metrics calculation
   const completedCount = tasks.filter((t) => t.completed).length;
   const pendingTasks = tasks.filter((t) => !t.completed);
   const pendingCount = pendingTasks.length;
-  const overdueCount = pendingTasks.filter(
-    (t) => new Date(t.dueDate).getTime() < Date.now()
-  ).length;
+  const overdueCount = pendingTasks.filter((t) => isOverdue(t.dueDate, t.completed)).length;
   const completionRate =
     tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
   const highPriorityTasks = pendingTasks.filter((t) => t.priority === 'high');

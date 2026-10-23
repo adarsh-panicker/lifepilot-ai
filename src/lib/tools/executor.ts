@@ -3,6 +3,7 @@ import {
   getTaskById,
   createTask,
   updateTask,
+  deleteTask,
   logActivity,
 } from '../db';
 import { Task, DailyPlan, DailyPlanItem, ProductivityInsights } from '../types';
@@ -95,9 +96,16 @@ export async function executeTool(
         // If ID wasn't provided, try searching pending tasks by title query
         if (!taskId && titleQuery) {
           const pending = getAllTasks({ status: 'pending' });
-          const matched = pending.find(
+          let matched = pending.find(
             (t) => t.title.toLowerCase().includes(titleQuery) || titleQuery.includes(t.title.toLowerCase())
           );
+          if (!matched) {
+            // Check significant keyword match
+            const words = titleQuery.split(/\s+/).filter((w) => w.length >= 3);
+            matched = pending.find((t) =>
+              words.some((w) => t.title.toLowerCase().includes(w))
+            );
+          }
           if (matched) {
             taskId = matched.id;
           }
@@ -114,6 +122,39 @@ export async function executeTool(
 
         result = updated;
         userMessage = `Marked task "${updated.title}" as completed!`;
+        break;
+      }
+
+      case 'delete_task': {
+        let taskId = typeof args.id === 'string' ? args.id : undefined;
+        const titleQuery = typeof args.titleQuery === 'string' ? args.titleQuery.toLowerCase() : '';
+
+        if (!taskId && titleQuery) {
+          const all = getAllTasks();
+          let matched = all.find(
+            (t) => t.title.toLowerCase().includes(titleQuery) || titleQuery.includes(t.title.toLowerCase())
+          );
+          if (!matched) {
+            const words = titleQuery.split(/\s+/).filter((w) => w.length >= 3);
+            matched = all.find((t) => words.some((w) => t.title.toLowerCase().includes(w)));
+          }
+          if (matched) {
+            taskId = matched.id;
+          }
+        }
+
+        if (!taskId) {
+          throw new Error('Task ID or title is required to delete a task.');
+        }
+
+        const target = getTaskById(taskId);
+        const deleted = deleteTask(taskId);
+        if (!deleted) {
+          throw new Error(`Task with ID ${taskId} not found.`);
+        }
+
+        result = { deletedId: taskId, title: target?.title || taskId };
+        userMessage = `Deleted task "${target?.title || taskId}".`;
         break;
       }
 
@@ -193,13 +234,24 @@ export async function executeTool(
         const availableHours = typeof args.availableHours === 'number' && args.availableHours > 0 ? args.availableHours : 6;
         const availableMinutes = Math.min(availableHours * 60, 720); // max 12 hours
         const startHour = typeof args.startHour === 'number' && args.startHour >= 0 && args.startHour <= 23 ? args.startHour : 9;
+        const focusArea = typeof args.focusArea === 'string' ? args.focusArea.toLowerCase() : 'general';
 
         const pending = getAllTasks({ status: 'pending' });
 
-        // Sort by: Overdue first, then High priority, then earliest due date
+        // Sort based on chosen focusArea
         const sorted = [...pending].sort((a, b) => {
           const aOverdue = isOverdue(a.dueDate, a.completed);
           const bOverdue = isOverdue(b.dueDate, b.completed);
+
+          if (focusArea === 'study') {
+            if (a.category === 'Study' && b.category !== 'Study') return -1;
+            if (a.category !== 'Study' && b.category === 'Study') return 1;
+          }
+
+          if (focusArea === 'quick' || focusArea === 'quick progress') {
+            return (a.estimatedMinutes || 30) - (b.estimatedMinutes || 30);
+          }
+
           if (aOverdue && !bOverdue) return -1;
           if (!aOverdue && bOverdue) return 1;
 

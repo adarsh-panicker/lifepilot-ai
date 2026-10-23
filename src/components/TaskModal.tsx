@@ -60,12 +60,25 @@ export default function TaskModal({
     try {
       setIsSubmitting(true);
       setError('');
+
+      let finalDueDate: string | undefined = undefined;
+      if (dueDate) {
+        if (dueDate.length === 10) {
+          // Date string format YYYY-MM-DD: set time to 20:00:00 (8:00 PM local)
+          const [year, month, day] = dueDate.split('-').map(Number);
+          const target = new Date(year, month - 1, day, 20, 0, 0);
+          finalDueDate = target.toISOString();
+        } else {
+          finalDueDate = new Date(dueDate).toISOString();
+        }
+      }
+
       await onSave({
         title: title.trim(),
         description: description.trim(),
         priority,
         category,
-        dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
+        dueDate: finalDueDate,
         estimatedMinutes: Number(estimatedMinutes) || 30,
       });
       onClose();

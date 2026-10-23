@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ProductivityInsights } from '@/lib/types';
+import { isOverdue } from '@/lib/utils';
 import {
   BarChart3,
   TrendingUp,
@@ -28,9 +29,7 @@ export default function InsightsPage() {
         const tasks = data.tasks as any[];
         const completed = tasks.filter((t) => t.completed);
         const pending = tasks.filter((t) => !t.completed);
-        const overdue = pending.filter(
-          (t) => new Date(t.dueDate).getTime() < Date.now()
-        );
+        const overdue = pending.filter((t) => isOverdue(t.dueDate, t.completed));
 
         const totalEstMinutes = pending.reduce((acc, t) => acc + (t.estimatedMinutes || 30), 0);
         const completedMinutes = completed.reduce((acc, t) => acc + (t.estimatedMinutes || 30), 0);

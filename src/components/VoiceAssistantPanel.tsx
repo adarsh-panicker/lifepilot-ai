@@ -55,8 +55,12 @@ export default function VoiceAssistantPanel({
         handleSendQuery(transcript);
       };
 
-      recognition.onerror = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      recognition.onerror = (event: any) => {
         setIsListening(false);
+        if (event.error === 'not-allowed') {
+          setErrorMessage('Microphone access was denied by browser. You can type or click any demo prompt below.');
+        }
       };
 
       recognition.onend = () => {

@@ -89,6 +89,7 @@ export default function TasksPage() {
       });
     }
     setEditingTask(null);
+    setModalOpen(false);
     fetchTasks();
   };
 

@@ -88,6 +88,34 @@ describe('LifePilot Application Tools', () => {
     });
   });
 
+  it('delete_task should remove task by ID', async () => {
+    const tasks = getAllTasks();
+    const target = tasks[0];
+
+    const res = await executeTool('delete_task', { id: target.id });
+    expect(res.success).toBe(true);
+
+    const remaining = getAllTasks();
+    expect(remaining.some((t) => t.id === target.id)).toBe(false);
+  });
+
+  it('generate_daily_plan should prioritize study tasks when focusArea is study', async () => {
+    const res = await executeTool('generate_daily_plan', {
+      availableHours: 3,
+      startHour: 10,
+      focusArea: 'study',
+    });
+
+    expect(res.success).toBe(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const plan = res.data as any;
+    expect(plan.items.length).toBeGreaterThan(0);
+    // First non-break item should be study if available
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const nonBreak = plan.items.filter((i: any) => !i.isBreak);
+    expect(nonBreak[0].category).toBe('Study');
+  });
+
   it('should reject unknown tool gracefully', async () => {
     const res = await executeTool('unauthorized_shell_exec', { command: 'rm -rf /' });
     expect(res.success).toBe(false);

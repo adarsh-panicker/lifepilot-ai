@@ -137,6 +137,27 @@ export const BEDROCK_TOOLS = [
   },
   {
     toolSpec: {
+      name: 'delete_task',
+      description: 'Deletes an existing task from the persistent database by ID or title.',
+      inputSchema: {
+        json: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'The unique ID of the task to delete.',
+            },
+            titleQuery: {
+              type: 'string',
+              description: 'The title or keywords of the task to delete if ID is unknown.',
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    toolSpec: {
       name: 'get_daily_summary',
       description: 'Retrieves an analytical summary of the user\'s tasks: total tasks, completed, pending, overdue, and upcoming priorities.',
       inputSchema: {

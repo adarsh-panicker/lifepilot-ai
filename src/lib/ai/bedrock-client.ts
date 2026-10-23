@@ -132,21 +132,37 @@ Guidelines:
     tools: BEDROCK_TOOLS as any,
   };
 
-  // Build message history
+  // Build message history conforming to Bedrock Converse requirements:
+  // 1. Must start with a 'user' message.
+  // 2. Must alternate between user and assistant.
   const converseMessages: Message[] = [];
 
-  for (const h of history.slice(-6)) {
-    converseMessages.push({
-      role: h.role === 'user' ? 'user' : 'assistant',
-      content: [{ text: h.content }],
-    });
+  const rawHistory = history.slice(-6).filter((h) => h.content && h.content.trim());
+  const firstUserIdx = rawHistory.findIndex((h) => h.role === 'user');
+  const validHistory = firstUserIdx >= 0 ? rawHistory.slice(firstUserIdx) : [];
+
+  for (const h of validHistory) {
+    const role = h.role === 'user' ? 'user' : 'assistant';
+    const lastMsg = converseMessages[converseMessages.length - 1];
+    if (lastMsg && lastMsg.role === role) {
+      lastMsg.content = [...(lastMsg.content || []), { text: `\n${h.content}` }];
+    } else {
+      converseMessages.push({
+        role,
+        content: [{ text: h.content }],
+      });
+    }
   }
 
-  // Add current query
-  converseMessages.push({
-    role: 'user',
-    content: [{ text: userQuery }],
-  });
+  const lastMsg = converseMessages[converseMessages.length - 1];
+  if (lastMsg && lastMsg.role === 'user') {
+    lastMsg.content = [...(lastMsg.content || []), { text: `\n${userQuery}` }];
+  } else {
+    converseMessages.push({
+      role: 'user',
+      content: [{ text: userQuery }],
+    });
+  }
 
   const toolCalls: ToolCallRecord[] = [];
 

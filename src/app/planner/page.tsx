@@ -38,7 +38,7 @@ export default function PlannerPage() {
 
   useEffect(() => {
     generatePlan();
-  }, []);
+  }, [availableHours, startHour, focusArea]);
 
   return (
     <div className="space-y-6 pb-12">
