@@ -158,7 +158,7 @@ Run the comprehensive Vitest test suite:
 ```bash
 npm run test
 ```
-All 22 automated tests (Database CRUD, Tool execution, Demo Engine NLP, and API routes) run in under 1 second.
+All 24 automated tests (Database CRUD, Tool execution, Demo Engine NLP, and API routes) run in under 1 second.
 
 ---
 
@@ -179,8 +179,6 @@ Every tool is strictly typed, validated on the server, and recorded in the audit
 
 - [Architecture Design & Security Specification](docs/ARCHITECTURE.md)
 - [Amazon Bedrock Setup Guide](docs/BEDROCK_SETUP.md)
-- [Hackathon Submission Document](docs/HACKATHON_SUBMISSION.md)
-- [Video Demo Script (< 2m45s)](docs/DEMO_VIDEO_SCRIPT.md)
 
 ---
 
