@@ -66,6 +66,34 @@ LifePilot AI is completely open source under the permissive [MIT License](LICENS
 
 ---
 
+## 📸 Application Screenshots
+
+### 1. Executive Dashboard & Quick Trajectory
+*Personalized briefing, real-time KPI metrics, upcoming priorities, and timeline preview.*
+![LifePilot Dashboard](docs/screenshots/01-dashboard.png)
+
+### 2. Simulated Alexa+ Voice Assistant with Live Audit Trail
+*Voice recognition, wave animation, natural intent resolution, and structured tool execution history.*
+![Simulated Alexa+ Voice Assistant](docs/screenshots/02-voice-assistant.png)
+
+### 3. Smart Daily Planner
+*Algorithmic non-overlapping schedule, cognitive rest breaks, and explainable prioritization.*
+![Smart Daily Planner](docs/screenshots/03-smart-planner.png)
+
+### 4. Task Manager
+*Full CRUD modal, multi-filter tabs, search, priority badges, and overdue detection.*
+![Task Manager](docs/screenshots/04-task-manager.png)
+
+### 5. Productivity Insights
+*Workload velocity, priority distributions, and actionable AI recommendations.*
+![Productivity Insights](docs/screenshots/05-productivity-insights.png)
+
+### 6. Amazon Bedrock & System Settings
+*Dual-mode switcher (Demo vs Bedrock), live AWS connectivity test, and one-click demo data reset.*
+![Bedrock Settings](docs/screenshots/06-bedrock-settings.png)
+
+---
+
 ## 🛠️ Technology Stack
 
 | Layer | Technology |
